@@ -352,7 +352,13 @@ public class AntCertificationUtil {
     public static X509Certificate getCertFromPath(String certPath) throws AlipayApiException {
         InputStream inputStream = null;
         try {
-            inputStream = new FileInputStream(certPath);
+
+//            inputStream = new FileInputStream(certPath);
+
+            //上面的方式不支持证书文件打在jar中根据certPath获取不到，使用这种方式.update by fpj on 20200527
+            inputStream = AntCertificationUtil.class.getClassLoader().getResourceAsStream(certPath);
+
+
             CertificateFactory cf = CertificateFactory.getInstance("X.509", "BC");
             return (X509Certificate) cf.generateCertificate(inputStream);
         } catch (Exception e) {

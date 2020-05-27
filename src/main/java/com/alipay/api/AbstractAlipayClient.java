@@ -15,7 +15,9 @@ import com.alipay.api.internal.util.RequestParametersHolder;
 import com.alipay.api.internal.util.StringUtils;
 import com.alipay.api.internal.util.WebUtils;
 import com.alipay.api.internal.util.codec.Base64;
+import com.alipay.api.internal.util.file.Charsets;
 import com.alipay.api.internal.util.file.FileUtils;
+import com.alipay.api.internal.util.file.IOUtils;
 import com.alipay.api.internal.util.json.JSONWriter;
 
 import javax.net.ssl.SSLException;
@@ -23,6 +25,7 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.Charset;
 import java.security.NoSuchProviderException;
 import java.security.PublicKey;
 import java.security.Security;
@@ -157,7 +160,13 @@ public abstract class AbstractAlipayClient implements AlipayClient {
 
     private String readFileToString(String rootCertPath) throws AlipayApiException {
         try {
-            return FileUtils.readFileToString(new File(rootCertPath));
+//            return FileUtils.readFileToString(new File(rootCertPath));
+
+            //上面的方式不支持证书文件打在jar中根据certPath获取不到，使用这种方式.update by fpj on 20200527
+            InputStream inputStream = AntCertificationUtil.class.getClassLoader().getResourceAsStream(rootCertPath);
+            return IOUtils.toString(inputStream, Charset.defaultCharset());
+
+
         } catch (IOException e) {
             throw new AlipayApiException(e);
         }
